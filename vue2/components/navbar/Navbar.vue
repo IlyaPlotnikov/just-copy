@@ -43,10 +43,11 @@
           { 'menu-container__raz--open': menuOpen, 'menu-container__raz--closed': !menuOpen }
         ]"
       >
-        <div 
+        <div
           v-for="(icon, index) in radialIcons"
           :key="index"
           class="menu-container__radial-icon"
+          :style="getItemPosition(index)"
         >
           <img :src="icon" />
         </div>
@@ -62,6 +63,7 @@ export default {
     return {
       menuOpen: false,
       selectedIndex: 0,
+      radius: 72.5,
       leftIcons: [
         "https://img.icons8.com/material/24/chat--v1.png", 
         "https://img.icons8.com/material/24/computer-chat.png"
@@ -72,7 +74,7 @@ export default {
       ],
       radialIcons: [
         "https://img.icons8.com/material/24/compact-camera--v1.png", 
-        "https://img.icons8.com/material/24/image-gallery.png", 
+        "https://img.icons8.com/material/24/image-gallery.png",
         "https://img.icons8.com/material/24/video-record--v1.png"
       ],
     };
@@ -94,7 +96,40 @@ export default {
     selectIcon(index) {
       this.selectedIndex = index;
     },
+    getItemPosition(index) {
+      const totalItems = this.radialIcons.length;
+      const angle = (index / (totalItems - 1)) * Math.PI;
+      
+      const formatterY = this.getValueForAngleY(angle)
+      const formatterX = this.getValueForAngleX(angle)
+
+      const x = this.radius * Math.cos(angle) + formatterX;
+      const y = this.radius * Math.sin(angle) + formatterY;
+
+      return {
+        position: 'absolute',
+        left: `${this.radius + x}px`,
+        top: `${this.radius - y}px`,
+        transform: 'translate(-50%, -50%)',
+      };
+    },
+    getValueForAngleX(angle) {
+      return -20 + (40 / Math.PI) * angle;
+    },
+    getValueForAngleY(angle) {
+      const halfPi = Math.PI / 2;
+      const step = 1.4;
+
+      if (angle === halfPi) {
+        return -20;
+      }
+      if (angle < halfPi) {
+        return 20 - (40 / halfPi) * (angle * step);
+      }
+      return 20 - (40 / halfPi) * ((Math.PI - angle) * step);
+    }
   }
+
 };
 </script>
 
